@@ -77,25 +77,29 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
   const tabs = getTabs();
 
   const academicLinks = [
-    { title: 'Academics', href: '/academics', description: 'Explore our academic programs' },
-    { title: 'Admissions', href: '/admissions', description: 'Apply to our university' },
-    { title: 'Research', href: '/research', description: 'Discover research opportunities' },
-    { title: 'Library', href: '/library', description: 'Access academic resources' },
+    { title: 'Academics', href: '#academics', description: 'Explore our academic programs' },
+    { title: 'Admissions', href: '#admissions', description: 'Apply to our university' },
+    { title: 'Research', href: '#research', description: 'Discover research opportunities' },
+    { title: 'Library', href: '#library', description: 'Access academic resources' },
   ];
 
   const campusLinks = [
-    { title: 'Campus Life', href: '/campus-life', description: 'Student activities and organizations' },
-    { title: 'Housing', href: '/housing', description: 'On-campus living options' },
-    { title: 'Dining', href: '/dining', description: 'Campus dining facilities' },
-    { title: 'Recreation', href: '/recreation', description: 'Sports and fitness facilities' },
+    { title: 'Campus Life', href: '#campus-life', description: 'Student activities and organizations' },
+    { title: 'Housing', href: '#housing', description: 'On-campus living options' },
+    { title: 'Dining', href: '#dining', description: 'Campus dining facilities' },
+    { title: 'Recreation', href: '#recreation', description: 'Sports and fitness facilities' },
   ];
 
   const servicesLinks = [
-    { title: 'Career Services', href: '/career-services', description: 'Job placement and career guidance' },
-    { title: 'Student Support', href: '/student-support', description: 'Academic and personal support' },
-    { title: 'Health Services', href: '/health-services', description: 'Campus health and wellness' },
-    { title: 'IT Services', href: '/it-services', description: 'Technology support' },
+    { title: 'Career Services', href: '#career-services', description: 'Job placement and career guidance' },
+    { title: 'Student Support', href: '#student-support', description: 'Academic and personal support' },
+    { title: 'Health Services', href: '#health-services', description: 'Campus health and wellness' },
+    { title: 'IT Services', href: '#it-services', description: 'Technology support' },
   ];
+
+  const handleNavigation = (page: string) => {
+    onTabChange(page);
+  };
 
   return (
     <div className="campus-card mb-6">
@@ -118,10 +122,10 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="sm" className="text-campus-lightgrey hover:text-white">
-              <a href="/apply" className="flex items-center">Apply Now</a>
+              <span>Apply Now</span>
             </Button>
             <Button variant="ghost" size="sm" className="text-campus-lightgrey hover:text-white">
-              <a href="/visit" className="flex items-center">Visit Campus</a>
+              <span>Visit Campus</span>
             </Button>
           </div>
         </div>
@@ -158,14 +162,14 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
                     <div className="bg-campus-charcoal border-campus-grey p-4 w-96">
                       <div className="grid grid-cols-1 gap-3">
                         {academicLinks.map((link) => (
-                          <a
+                          <button
                             key={link.title}
-                            href={link.href}
-                            className="block p-3 rounded-lg hover:bg-campus-grey/20 transition-colors"
+                            onClick={() => console.log(`Navigate to ${link.title}`)}
+                            className="block p-3 rounded-lg hover:bg-campus-grey/20 transition-colors text-left"
                           >
                             <div className="text-white font-medium">{link.title}</div>
                             <div className="text-campus-lightgrey text-sm">{link.description}</div>
-                          </a>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -180,14 +184,14 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
                     <div className="bg-campus-charcoal border-campus-grey p-4 w-96">
                       <div className="grid grid-cols-1 gap-3">
                         {campusLinks.map((link) => (
-                          <a
+                          <button
                             key={link.title}
-                            href={link.href}
-                            className="block p-3 rounded-lg hover:bg-campus-grey/20 transition-colors"
+                            onClick={() => console.log(`Navigate to ${link.title}`)}
+                            className="block p-3 rounded-lg hover:bg-campus-grey/20 transition-colors text-left"
                           >
                             <div className="text-white font-medium">{link.title}</div>
                             <div className="text-campus-lightgrey text-sm">{link.description}</div>
-                          </a>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -202,14 +206,14 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
                     <div className="bg-campus-charcoal border-campus-grey p-4 w-96">
                       <div className="grid grid-cols-1 gap-3">
                         {servicesLinks.map((link) => (
-                          <a
+                          <button
                             key={link.title}
-                            href={link.href}
-                            className="block p-3 rounded-lg hover:bg-campus-grey/20 transition-colors"
+                            onClick={() => console.log(`Navigate to ${link.title}`)}
+                            className="block p-3 rounded-lg hover:bg-campus-grey/20 transition-colors text-left"
                           >
                             <div className="text-white font-medium">{link.title}</div>
                             <div className="text-campus-lightgrey text-sm">{link.description}</div>
-                          </a>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -241,30 +245,42 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
               <DropdownMenuContent align="end" className="bg-campus-charcoal border-campus-grey w-56">
                 <DropdownMenuLabel className="text-white">Quick Access</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-campus-grey" />
-                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                <DropdownMenuItem 
+                  className="text-campus-lightgrey hover:bg-campus-grey hover:text-white cursor-pointer"
+                  onClick={() => handleNavigation('profile')}
+                >
                   <User className="w-4 h-4 mr-2" />
-                  <a href="/profile">My Profile</a>
+                  <span>My Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                <DropdownMenuItem 
+                  className="text-campus-lightgrey hover:bg-campus-grey hover:text-white cursor-pointer"
+                  onClick={() => handleNavigation('settings')}
+                >
                   <Settings className="w-4 h-4 mr-2" />
-                  <a href="/settings">Settings</a>
+                  <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                <DropdownMenuItem 
+                  className="text-campus-lightgrey hover:bg-campus-grey hover:text-white cursor-pointer"
+                  onClick={() => handleNavigation('help')}
+                >
                   <HelpCircle className="w-4 h-4 mr-2" />
-                  <a href="/help">Help & Support</a>
+                  <span>Help & Support</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                <DropdownMenuItem 
+                  className="text-campus-lightgrey hover:bg-campus-grey hover:text-white cursor-pointer"
+                  onClick={() => handleNavigation('bookings')}
+                >
                   <BookOpen className="w-4 h-4 mr-2" />
-                  <a href="/student-portal">Student Portal</a>
+                  <span>Student Portal</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-campus-grey" />
-                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white cursor-pointer">
                   <MapPin className="w-4 h-4 mr-2" />
-                  <a href="/campus-map">Campus Map</a>
+                  <span>Campus Map</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white cursor-pointer">
                   <Calendar className="w-4 h-4 mr-2" />
-                  <a href="/academic-calendar">Academic Calendar</a>
+                  <span>Academic Calendar</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -336,25 +352,25 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
               <div className="space-y-2">
                 <h3 className="text-white font-medium">Academics</h3>
                 {academicLinks.map((link) => (
-                  <a key={link.title} href={link.href} className="block text-campus-lightgrey hover:text-white py-1">
+                  <button key={link.title} onClick={() => console.log(`Navigate to ${link.title}`)} className="block text-campus-lightgrey hover:text-white py-1 text-left">
                     {link.title}
-                  </a>
+                  </button>
                 ))}
               </div>
               <div className="space-y-2">
                 <h3 className="text-white font-medium">Campus Life</h3>
                 {campusLinks.map((link) => (
-                  <a key={link.title} href={link.href} className="block text-campus-lightgrey hover:text-white py-1">
+                  <button key={link.title} onClick={() => console.log(`Navigate to ${link.title}`)} className="block text-campus-lightgrey hover:text-white py-1 text-left">
                     {link.title}
-                  </a>
+                  </button>
                 ))}
               </div>
               <div className="space-y-2">
                 <h3 className="text-white font-medium">Services</h3>
                 {servicesLinks.map((link) => (
-                  <a key={link.title} href={link.href} className="block text-campus-lightgrey hover:text-white py-1">
+                  <button key={link.title} onClick={() => console.log(`Navigate to ${link.title}`)} className="block text-campus-lightgrey hover:text-white py-1 text-left">
                     {link.title}
-                  </a>
+                  </button>
                 ))}
               </div>
               <div className="pt-4 border-t border-campus-grey/20">

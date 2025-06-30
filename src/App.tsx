@@ -21,6 +21,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Event, Booking } from "@/types";
 import { mockEvents, mockBookings } from "@/lib/supabase";
 import { Plus, Search, Filter, TrendingUp, Users, Calendar as CalendarIcon, Clock, MapPin, Calendar } from 'lucide-react';
+import Settings from "@/components/pages/Settings";
+import MyProfile from "@/components/pages/MyProfile";
+import HelpSupport from "@/components/pages/HelpSupport";
 
 const queryClient = new QueryClient();
 
@@ -196,7 +199,10 @@ const AuthenticatedApp: React.FC = () => {
         {filteredEvents.map((event) => (
           <EventCard
             key={event.id}
-            event={event}
+            event={{
+              ...event,
+              image_url: event.image_url || `https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=400&h=300&fit=crop`
+            }}
             onBookTicket={user?.role !== 'admin' ? (event) => {
               setSelectedEvent(event);
               setIsBookingOpen(true);
@@ -455,6 +461,12 @@ const AuthenticatedApp: React.FC = () => {
         );
       case 'scanner':
         return <QRScanner />;
+      case 'settings':
+        return <Settings />;
+      case 'profile':
+        return <MyProfile />;
+      case 'help':
+        return <HelpSupport />;
       default:
         return renderEvents();
     }
