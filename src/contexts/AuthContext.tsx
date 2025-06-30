@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: Date.now().toString(),
         email: userData.email!,
         name: userData.name!,
-        role: userData.role || 'user',
+        role: userData.role || 'student',
         student_id: userData.student_id,
         club_name: userData.club_name,
         created_at: new Date().toISOString()

@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://your-project-url.supabase.co';
@@ -10,18 +9,26 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 export const mockUsers = [
   {
     id: '1',
-    email: 'admin@campus.edu',
-    name: 'Admin User',
-    role: 'admin' as const,
-    created_at: new Date().toISOString()
+    email: 'student@campus.edu',
+    name: 'Laksheiya',
+    role: 'student' as const,
+    student_id: 'STU001',
+    created_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
-    email: 'student@campus.edu',
-    name: 'John Doe',
-    role: 'user' as const,
-    student_id: 'STU001',
-    created_at: new Date().toISOString()
+    email: 'organizer@campus.edu',
+    name: 'Laksheiya',
+    role: 'organizer' as const,
+    club_name: 'Tech Club',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    email: 'admin@campus.edu',
+    name: 'Admin',
+    role: 'admin' as const,
+    created_at: '2024-01-01T00:00:00Z'
   }
 ];
 

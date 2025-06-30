@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Event } from '@/types';
 import { Calendar, Clock, MapPin, Users, DollarSign } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EventCardProps {
   event: Event;
@@ -19,6 +20,8 @@ const EventCard: React.FC<EventCardProps> = ({
   onEdit, 
   showActions = true 
 }) => {
+  const { user } = useAuth();
+
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
       weekday: 'long',
@@ -62,9 +65,12 @@ const EventCard: React.FC<EventCardProps> = ({
               by {event.organizer_name}
             </CardDescription>
           </div>
-          <Badge className={getStatusColor(event.status)}>
-            {event.status}
-          </Badge>
+          {/* Only show status badge for organizers and admins */}
+          {user?.role !== 'student' && (
+            <Badge className={getStatusColor(event.status)}>
+              {event.status}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

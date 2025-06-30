@@ -1,9 +1,8 @@
-
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: 'student' | 'organizer' | 'admin';
   student_id?: string;
   club_name?: string;
   created_at: string;

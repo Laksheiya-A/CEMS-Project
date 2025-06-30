@@ -53,14 +53,22 @@ const AuthenticatedApp: React.FC = () => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || event.category === categoryFilter;
-    const isApproved = event.status === 'approved';
     
-    return matchesSearch && matchesCategory && isApproved;
+    // Students only see approved events
+    if (user?.role === 'student') {
+      return matchesSearch && matchesCategory && event.status === 'approved';
+    }
+    
+    // Organizers and admins see all events
+    return matchesSearch && matchesCategory;
   });
 
-  const userEvents = events.filter(event => event.organizer_id === user?.id);
+  const userCreatedEvents = events.filter(event => event.organizer_id === user?.id);
+  const userRegisteredEvents = bookings
+    .filter(booking => booking.user_id === user?.id)
+    .map(booking => booking.event)
+    .filter(Boolean) as Event[];
   const userBookings = bookings.filter(booking => booking.user_id === user?.id);
-
   const categories = ['all', ...Array.from(new Set(events.map(e => e.category)))];
 
   // Statistics for dashboard
@@ -126,15 +134,21 @@ const AuthenticatedApp: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div>
           <h2 className="text-2xl font-bold text-white">Campus Events</h2>
-          <p className="text-campus-lightgrey">Discover and book tickets for upcoming events</p>
+          <p className="text-campus-lightgrey">
+            {user?.role === 'student' && 'Discover and book tickets for upcoming events'}
+            {user?.role === 'organizer' && 'Discover and book tickets for upcoming events'}
+            {user?.role === 'admin' && 'Manage and oversee all campus events'}
+          </p>
         </div>
-        <Button
-          onClick={() => setIsCreateEventOpen(true)}
-          className="campus-button"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Event
-        </Button>
+        {(user?.role === 'organizer' || user?.role === 'admin') && (
+          <Button
+            onClick={() => setIsCreateEventOpen(true)}
+            className="campus-button"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Event
+          </Button>
+        )}
       </div>
 
       <Card className="campus-card">
@@ -175,10 +189,10 @@ const AuthenticatedApp: React.FC = () => {
           <EventCard
             key={event.id}
             event={event}
-            onBookTicket={(event) => {
+            onBookTicket={user?.role !== 'admin' ? (event) => {
               setSelectedEvent(event);
               setIsBookingOpen(true);
-            }}
+            } : undefined}
           />
         ))}
       </div>
@@ -196,43 +210,121 @@ const AuthenticatedApp: React.FC = () => {
   );
 
   const renderMyEvents = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8">
+      {/* Registered Events Section */}
+      <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">My Events</h2>
-          <p className="text-campus-lightgrey">Events you've created</p>
+          <h2 className="text-2xl font-bold text-white">My Registered Events</h2>
+          <p className="text-campus-lightgrey">Events you have registered for</p>
         </div>
-        <Button
-          onClick={() => setIsCreateEventOpen(true)}
-          className="campus-button"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Event
-        </Button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {userRegisteredEvents.map((event) => (
+            <EventCard
+              key={`registered-${event.id}`}
+              event={event}
+              showActions={false}
+            />
+          ))}
+        </div>
+
+        {userRegisteredEvents.length === 0 && (
+          <Card className="campus-card">
+            <CardContent className="text-center py-8">
+              <p className="text-campus-lightgrey">You haven't registered for any events yet</p>
+              <Button
+                onClick={() => setActiveTab('events')}
+                className="campus-button mt-4"
+              >
+                Browse Events
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {userEvents.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            showActions={false}
-          />
-        ))}
-      </div>
-
-      {userEvents.length === 0 && (
-        <Card className="campus-card">
-          <CardContent className="text-center py-12">
-            <p className="text-campus-lightgrey text-lg">You haven't created any events yet</p>
+      {/* Created Events Section - Only for organizers */}
+      {user?.role === 'organizer' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-white">My Created Events</h2>
+              <p className="text-campus-lightgrey">Events you've created</p>
+            </div>
             <Button
               onClick={() => setIsCreateEventOpen(true)}
-              className="campus-button mt-4"
+              className="campus-button"
             >
-              Create Your First Event
+              <Plus className="w-4 h-4 mr-2" />
+              Create Event
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* Approved Events */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-green-400">Approved Events</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userCreatedEvents.filter(event => event.status === 'approved').map((event) => (
+                <EventCard
+                  key={`approved-${event.id}`}
+                  event={event}
+                  showActions={false}
+                />
+              ))}
+            </div>
+            {userCreatedEvents.filter(event => event.status === 'approved').length === 0 && (
+              <p className="text-campus-lightgrey text-sm">No approved events</p>
+            )}
+          </div>
+
+          {/* Pending Events */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-yellow-400">Pending Events</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userCreatedEvents.filter(event => event.status === 'pending').map((event) => (
+                <EventCard
+                  key={`pending-${event.id}`}
+                  event={event}
+                  showActions={false}
+                />
+              ))}
+            </div>
+            {userCreatedEvents.filter(event => event.status === 'pending').length === 0 && (
+              <p className="text-campus-lightgrey text-sm">No pending events</p>
+            )}
+          </div>
+
+          {/* Rejected Events */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-red-400">Rejected Events</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userCreatedEvents.filter(event => event.status === 'rejected').map((event) => (
+                <EventCard
+                  key={`rejected-${event.id}`}
+                  event={event}
+                  showActions={false}
+                />
+              ))}
+            </div>
+            {userCreatedEvents.filter(event => event.status === 'rejected').length === 0 && (
+              <p className="text-campus-lightgrey text-sm">No rejected events</p>
+            )}
+          </div>
+
+          {userCreatedEvents.length === 0 && (
+            <Card className="campus-card">
+              <CardContent className="text-center py-12">
+                <p className="text-campus-lightgrey text-lg">You haven't created any events yet</p>
+                <Button
+                  onClick={() => setIsCreateEventOpen(true)}
+                  className="campus-button mt-4"
+                >
+                  Create Your First Event
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
     </div>
   );
@@ -297,18 +389,22 @@ const AuthenticatedApp: React.FC = () => {
       </div>
       <Footer />
 
-      <CreateEventModal
-        isOpen={isCreateEventOpen}
-        onClose={() => setIsCreateEventOpen(false)}
-        onEventCreated={handleEventCreated}
-      />
+      {(user?.role === 'organizer' || user?.role === 'admin') && (
+        <CreateEventModal
+          isOpen={isCreateEventOpen}
+          onClose={() => setIsCreateEventOpen(false)}
+          onEventCreated={handleEventCreated}
+        />
+      )}
 
-      <BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-        event={selectedEvent}
-        onBookingConfirmed={handleBookingConfirmed}
-      />
+      {user?.role !== 'admin' && (
+        <BookingModal
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          event={selectedEvent}
+          onBookingConfirmed={handleBookingConfirmed}
+        />
+      )}
     </div>
   );
 };

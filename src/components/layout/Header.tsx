@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,8 +31,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const userTabs = [
-    { id: 'events', label: 'Events', icon: Calendar },
+  const studentTabs = [
+    { id: 'events', label: 'Browse Events', icon: Calendar },
+    { id: 'bookings', label: 'My Bookings', icon: QrCode },
+  ];
+
+  const organizerTabs = [
+    { id: 'events', label: 'Browse Events', icon: Calendar },
     { id: 'my-events', label: 'My Events', icon: User },
     { id: 'bookings', label: 'My Bookings', icon: QrCode },
   ];
@@ -44,7 +48,20 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
     { id: 'scanner', label: 'QR Scanner', icon: QrCode },
   ];
 
-  const tabs = user?.role === 'admin' ? adminTabs : userTabs;
+  const getTabs = () => {
+    switch (user?.role) {
+      case 'student':
+        return studentTabs;
+      case 'organizer':
+        return organizerTabs;
+      case 'admin':
+        return adminTabs;
+      default:
+        return studentTabs;
+    }
+  };
+
+  const tabs = getTabs();
 
   const academicLinks = [
     { title: 'Academics', href: '#', description: 'Explore our academic programs' },
@@ -222,7 +239,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div>
               <h2 className="text-xl font-semibold text-white">Event Management System</h2>
-              <p className="text-campus-lightgrey text-sm">Manage and discover campus events</p>
+              <p className="text-campus-lightgrey text-sm">
+                {user?.role === 'student' && 'Discover and book campus events'}
+                {user?.role === 'organizer' && 'Manage and discover campus events'}
+                {user?.role === 'admin' && 'Administer and manage all campus events'}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               {tabs.map((tab) => {
