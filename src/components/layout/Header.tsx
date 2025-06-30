@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +9,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Calendar, 
   User, 
@@ -19,7 +28,11 @@ import {
   Phone,
   Mail,
   Menu,
-  X
+  X,
+  Settings,
+  HelpCircle,
+  Bell,
+  Search
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -64,24 +77,24 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
   const tabs = getTabs();
 
   const academicLinks = [
-    { title: 'Academics', href: '#', description: 'Explore our academic programs' },
-    { title: 'Admissions', href: '#', description: 'Apply to our university' },
-    { title: 'Research', href: '#', description: 'Discover research opportunities' },
-    { title: 'Library', href: '#', description: 'Access academic resources' },
+    { title: 'Academics', href: '/academics', description: 'Explore our academic programs' },
+    { title: 'Admissions', href: '/admissions', description: 'Apply to our university' },
+    { title: 'Research', href: '/research', description: 'Discover research opportunities' },
+    { title: 'Library', href: '/library', description: 'Access academic resources' },
   ];
 
   const campusLinks = [
-    { title: 'Campus Life', href: '#', description: 'Student activities and organizations' },
-    { title: 'Housing', href: '#', description: 'On-campus living options' },
-    { title: 'Dining', href: '#', description: 'Campus dining facilities' },
-    { title: 'Recreation', href: '#', description: 'Sports and fitness facilities' },
+    { title: 'Campus Life', href: '/campus-life', description: 'Student activities and organizations' },
+    { title: 'Housing', href: '/housing', description: 'On-campus living options' },
+    { title: 'Dining', href: '/dining', description: 'Campus dining facilities' },
+    { title: 'Recreation', href: '/recreation', description: 'Sports and fitness facilities' },
   ];
 
   const servicesLinks = [
-    { title: 'Career Services', href: '#', description: 'Job placement and career guidance' },
-    { title: 'Student Support', href: '#', description: 'Academic and personal support' },
-    { title: 'Health Services', href: '#', description: 'Campus health and wellness' },
-    { title: 'IT Services', href: '#', description: 'Technology support' },
+    { title: 'Career Services', href: '/career-services', description: 'Job placement and career guidance' },
+    { title: 'Student Support', href: '/student-support', description: 'Academic and personal support' },
+    { title: 'Health Services', href: '/health-services', description: 'Campus health and wellness' },
+    { title: 'IT Services', href: '/it-services', description: 'Technology support' },
   ];
 
   return (
@@ -105,10 +118,10 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="sm" className="text-campus-lightgrey hover:text-white">
-              Apply Now
+              <a href="/apply" className="flex items-center">Apply Now</a>
             </Button>
             <Button variant="ghost" size="sm" className="text-campus-lightgrey hover:text-white">
-              Visit Campus
+              <a href="/visit" className="flex items-center">Visit Campus</a>
             </Button>
           </div>
         </div>
@@ -206,8 +219,56 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
             </NavigationMenu>
           </div>
 
-          {/* User Info and Mobile Menu */}
+          {/* Right Side Menu Bar and User Info */}
           <div className="flex items-center space-x-4">
+            {/* Search Icon */}
+            <Button variant="ghost" size="sm" className="text-white hover:text-campus-pink">
+              <Search className="w-5 h-5" />
+            </Button>
+
+            {/* Notifications */}
+            <Button variant="ghost" size="sm" className="text-white hover:text-campus-pink">
+              <Bell className="w-5 h-5" />
+            </Button>
+
+            {/* Menu Bar Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-white hover:text-campus-pink">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-campus-charcoal border-campus-grey w-56">
+                <DropdownMenuLabel className="text-white">Quick Access</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-campus-grey" />
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                  <User className="w-4 h-4 mr-2" />
+                  <a href="/profile">My Profile</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                  <Settings className="w-4 h-4 mr-2" />
+                  <a href="/settings">Settings</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  <a href="/help">Help & Support</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <a href="/student-portal">Student Portal</a>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-campus-grey" />
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  <a href="/campus-map">Campus Map</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-campus-lightgrey hover:bg-campus-grey hover:text-white">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <a href="/academic-calendar">Academic Calendar</a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <div className="hidden md:flex items-center space-x-4">
               <div className="text-right">
                 <p className="text-white font-medium">{user?.name}</p>

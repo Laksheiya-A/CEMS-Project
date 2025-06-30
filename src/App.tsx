@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Event, Booking } from "@/types";
 import { mockEvents, mockBookings } from "@/lib/supabase";
-import { Plus, Search, Filter, TrendingUp, Users, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Search, Filter, TrendingUp, Users, Calendar as CalendarIcon, Clock, MapPin } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
@@ -34,6 +34,7 @@ const AuthenticatedApp: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [rsvpStatuses, setRsvpStatuses] = useState<{[key: string]: 'going' | 'maybe' | 'not_going' | null}>({});
 
   const handleEventCreated = (newEvent: Event) => {
     setEvents(prev => [newEvent, ...prev]);
@@ -47,6 +48,13 @@ const AuthenticatedApp: React.FC = () => {
     setEvents(prev => prev.map(event => 
       event.id === eventId ? { ...event, status } : event
     ));
+  };
+
+  const handleRsvpChange = (eventId: string, status: 'going' | 'maybe' | 'not_going') => {
+    setRsvpStatuses(prev => ({
+      ...prev,
+      [eventId]: status
+    }));
   };
 
   const filteredEvents = events.filter(event => {
@@ -220,11 +228,82 @@ const AuthenticatedApp: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {userRegisteredEvents.map((event) => (
-            <EventCard
-              key={`registered-${event.id}`}
-              event={event}
-              showActions={false}
-            />
+            <Card key={`registered-${event.id}`} className="event-card group">
+              {event.image_url && (
+                <div className="w-full h-48 overflow-hidden rounded-t-lg">
+                  <img
+                    src={event.image_url}
+                    alt={event.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <CardTitle className="text-white text-lg group-hover:text-campus-pink transition-colors">
+                  {event.title}
+                </CardTitle>
+                <CardDescription className="text-campus-lightgrey">
+                  by {event.organizer_name}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-campus-lightgrey text-sm line-clamp-3">
+                  {event.description}
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2 text-campus-lightgrey">
+                    <Calendar className="w-4 h-4 text-campus-pink" />
+                    <span>{new Date(event.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-campus-lightgrey">
+                    <Clock className="w-4 h-4 text-campus-pink" />
+                    <span>{event.time}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-campus-lightgrey">
+                    <MapPin className="w-4 h-4 text-campus-pink" />
+                    <span>{event.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-campus-lightgrey">
+                    <Users className="w-4 h-4 text-campus-pink" />
+                    <span>{event.capacity} seats</span>
+                  </div>
+                </div>
+
+                {/* RSVP Section for Students */}
+                {user?.role === 'student' && (
+                  <div className="pt-4 border-t border-campus-grey/20">
+                    <p className="text-white text-sm font-medium mb-2">RSVP Status:</p>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant={rsvpStatuses[event.id] === 'going' ? 'default' : 'outline'}
+                        onClick={() => handleRsvpChange(event.id, 'going')}
+                        className={rsvpStatuses[event.id] === 'going' ? 'campus-button' : 'border-campus-grey text-campus-lightgrey hover:bg-campus-charcoal hover:text-white'}
+                      >
+                        Going
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={rsvpStatuses[event.id] === 'maybe' ? 'default' : 'outline'}
+                        onClick={() => handleRsvpChange(event.id, 'maybe')}
+                        className={rsvpStatuses[event.id] === 'maybe' ? 'bg-yellow-500 hover:bg-yellow-600' : 'border-campus-grey text-campus-lightgrey hover:bg-campus-charcoal hover:text-white'}
+                      >
+                        Maybe
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={rsvpStatuses[event.id] === 'not_going' ? 'default' : 'outline'}
+                        onClick={() => handleRsvpChange(event.id, 'not_going')}
+                        className={rsvpStatuses[event.id] === 'not_going' ? 'bg-red-500 hover:bg-red-600' : 'border-campus-grey text-campus-lightgrey hover:bg-campus-charcoal hover:text-white'}
+                      >
+                        Not Going
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           ))}
         </div>
 
