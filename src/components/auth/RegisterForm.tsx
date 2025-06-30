@@ -17,7 +17,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     name: '',
     email: '',
     password: '',
-    role: 'user' as 'user' | 'admin',
+    role: 'student' as 'student' | 'organizer' | 'admin',
     student_id: '',
     club_name: '',
   });
@@ -98,18 +98,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
             <Label htmlFor="role" className="text-white">Role</Label>
             <Select
               value={formData.role}
-              onValueChange={(value: 'user' | 'admin') => setFormData({ ...formData, role: value })}
+              onValueChange={(value: 'student' | 'organizer' | 'admin') => setFormData({ ...formData, role: value })}
             >
               <SelectTrigger className="campus-input">
                 <SelectValue placeholder="Select your role" />
               </SelectTrigger>
               <SelectContent className="bg-campus-charcoal border-campus-grey">
-                <SelectItem value="user" className="text-white hover:bg-campus-grey">Student/Club Member</SelectItem>
+                <SelectItem value="student" className="text-white hover:bg-campus-grey">Student</SelectItem>
+                <SelectItem value="organizer" className="text-white hover:bg-campus-grey">Event Organizer</SelectItem>
                 <SelectItem value="admin" className="text-white hover:bg-campus-grey">Administrator</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          {formData.role === 'user' && (
+          {(formData.role === 'student' || formData.role === 'organizer') && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="student_id" className="text-white">Student ID (Optional)</Label>
@@ -121,16 +122,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                   placeholder="Enter your student ID"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="club_name" className="text-white">Club Name (Optional)</Label>
-                <Input
-                  id="club_name"
-                  value={formData.club_name}
-                  onChange={(e) => setFormData({ ...formData, club_name: e.target.value })}
-                  className="campus-input"
-                  placeholder="Enter your club name"
-                />
-              </div>
+              {formData.role === 'organizer' && (
+                <div className="space-y-2">
+                  <Label htmlFor="club_name" className="text-white">Club Name (Optional)</Label>
+                  <Input
+                    id="club_name"
+                    value={formData.club_name}
+                    onChange={(e) => setFormData({ ...formData, club_name: e.target.value })}
+                    className="campus-input"
+                    placeholder="Enter your club name"
+                  />
+                </div>
+              )}
             </>
           )}
           <Button
