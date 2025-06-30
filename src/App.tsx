@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,7 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
-import Navigation from "@/components/layout/Navigation";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import EventCard from "@/components/events/EventCard";
 import CreateEventModal from "@/components/events/CreateEventModal";
 import BookingModal from "@/components/booking/BookingModal";
@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Event, Booking } from "@/types";
 import { mockEvents, mockBookings } from "@/lib/supabase";
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, TrendingUp, Users, Calendar as CalendarIcon } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
@@ -63,8 +63,66 @@ const AuthenticatedApp: React.FC = () => {
 
   const categories = ['all', ...Array.from(new Set(events.map(e => e.category)))];
 
+  // Statistics for dashboard
+  const stats = {
+    totalEvents: events.filter(e => e.status === 'approved').length,
+    upcomingEvents: events.filter(e => e.status === 'approved' && new Date(e.date) > new Date()).length,
+    myBookings: userBookings.length,
+    pendingApprovals: events.filter(e => e.status === 'pending').length
+  };
+
   const renderEvents = () => (
     <div className="space-y-6">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <Card className="campus-card">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-campus-lightgrey text-sm">Total Events</p>
+                <p className="text-2xl font-bold text-white">{stats.totalEvents}</p>
+              </div>
+              <CalendarIcon className="w-8 h-8 text-campus-pink" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="campus-card">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-campus-lightgrey text-sm">Upcoming</p>
+                <p className="text-2xl font-bold text-white">{stats.upcomingEvents}</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-campus-pink" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="campus-card">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-campus-lightgrey text-sm">My Bookings</p>
+                <p className="text-2xl font-bold text-white">{stats.myBookings}</p>
+              </div>
+              <Users className="w-8 h-8 text-campus-pink" />
+            </div>
+          </CardContent>
+        </Card>
+        {user?.role === 'admin' && (
+          <Card className="campus-card">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-campus-lightgrey text-sm">Pending</p>
+                  <p className="text-2xl font-bold text-white">{stats.pendingApprovals}</p>
+                </div>
+                <Filter className="w-8 h-8 text-campus-pink" />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div>
           <h2 className="text-2xl font-bold text-white">Campus Events</h2>
@@ -128,7 +186,9 @@ const AuthenticatedApp: React.FC = () => {
       {filteredEvents.length === 0 && (
         <Card className="campus-card">
           <CardContent className="text-center py-12">
+            <CalendarIcon className="w-16 h-16 text-campus-grey mx-auto mb-4" />
             <p className="text-campus-lightgrey text-lg">No events found matching your criteria</p>
+            <p className="text-campus-lightgrey text-sm mt-2">Try adjusting your search or category filter</p>
           </CardContent>
         </Card>
       )}
@@ -231,10 +291,11 @@ const AuthenticatedApp: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-campus-black">
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="container mx-auto px-4 py-6">
-        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
         {renderContent()}
       </div>
+      <Footer />
 
       <CreateEventModal
         isOpen={isCreateEventOpen}
