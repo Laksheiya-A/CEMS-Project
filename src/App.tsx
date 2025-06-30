@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Event, Booking } from "@/types";
 import { mockEvents, mockBookings } from "@/lib/supabase";
-import { Plus, Search, Filter, TrendingUp, Users, Calendar as CalendarIcon, Clock, MapPin } from 'lucide-react';
+import { Plus, Search, Filter, TrendingUp, Users, Calendar as CalendarIcon, Clock, MapPin, Calendar } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
